@@ -1,4 +1,5 @@
 class Locators:
+
     # Dashboard
     temp = 'temperature' # id
     dasb_info = 'octicon octicon-info' # class
@@ -6,7 +7,7 @@ class Locators:
     buy_sunsc = 'Buy sunscreens' # link text
 
     # Selecting Items
-    items_list = '//button[@class="btn btn-primary"]' # xpath
+    items_list = '//div[@class="text-center col-4"]' # xpath
     Add_btn = '//button[@class="btn btn-primary"]' # xpath
 
 

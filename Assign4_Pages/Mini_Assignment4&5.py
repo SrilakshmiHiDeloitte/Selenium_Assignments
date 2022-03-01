@@ -2,33 +2,26 @@ import time
 import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from Pages.Locators import Locators
+from Selenium_Assignments.Assign4_Pages.Locators import Locators
 
-# Logging the errors
-logger = logging.getLogger()
+logging.basicConfig(filename='../../Pages/shopping.log', level=logging.DEBUG)
 
-fileHandler = logging.FileHandler('C:\\Users\\visrilakshmi\\Desktop\\Selenium_logs\\logs.log')
-
-logger.addHandler(fileHandler)
-
-# Initiating the driver
 driver = webdriver.Chrome(executable_path='C:\\Users\\visrilakshmi\\Downloads\\chromedriver.exe')
 
-# Opening url
 driver.get('https://weathershopper.pythonanywhere.com/')
 
 driver.maximize_window()
 time.sleep(2)
 driver.maximize_window()
+# items = driver.find_elements(by=By.XPATH, value='//button[@class="btn btn-primary"]')
+
 
 k = driver.find_element(by=By.ID, value=Locators.temp).text
 k = k.split(' ')
 temp = int(k[0])
 
-logger.error('This is error message')
 
-
-# Adding items to cart based on the info given in the website
+# Adding items to cart based on the info
 def adding_items(item):
     rate = []
     for i in items:
@@ -49,8 +42,8 @@ def adding_items(item):
             i.find_element(by=By.XPATH, value=Locators.Add_btn).click()
 
 
-# Payment Gateway - entering details of card and checkout
 def payment():
+    time.sleep(2)
     driver.find_element(by=By.ID, value=Locators.cart_btn).click()
     time.sleep(3)
     driver.find_element(by=By.CLASS_NAME, value=Locators.pay_btn).click()
@@ -59,7 +52,7 @@ def payment():
     # Entering Payment Details
     driver.switch_to.frame(Locators.frame)
     driver.find_element(by=By.ID, value=Locators.mail).send_keys(Locators.mail_in)
-    time.sleep(3)
+    time.sleep(2)
     driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
     time.sleep(2)
     driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
@@ -79,21 +72,18 @@ def payment():
     driver.find_element(by=By.ID, value=Locators.sub_pay).click()
 
 
-""" As given in the website executing methods if temperature < 19 then buying moisturisers
-      if temperature > 34 then buying sunscreens based up on cost and flavor"""
-try:
-    if temp <= 19:
-        driver.find_element(by=By.LINK_TEXT, value=Locators.buy_moist).click()
-        items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
-        adding_items(Locators.moist_item1)
-        adding_items(Locators.moist_item2)
-        payment()
+if temp <= 19:
+    driver.find_element(by=By.LINK_TEXT, value=Locators.buy_moist).click()
+    items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
+    adding_items(Locators.moist_item1)
+    adding_items(Locators.moist_item2)
+    payment()
 
-    elif temp >= 34:
-        driver.find_element(by=By.LINK_TEXT, value=Locators.buy_sunsc).click()
-        items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
-        adding_items(Locators.sunscr_item1)
-        adding_items(Locators.sunscr_item2)
-        payment()
-except ValueError:
-    logger.error('Error in Item Adding')
+
+elif temp >= 34:
+    driver.find_element(by=By.LINK_TEXT, value=Locators.buy_sunsc).click()
+    items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
+    adding_items(Locators.sunscr_item1)
+    adding_items(Locators.sunscr_item2)
+    payment()
+
