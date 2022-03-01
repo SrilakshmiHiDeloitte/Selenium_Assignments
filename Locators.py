@@ -1,5 +1,4 @@
 class Locators:
-
     # Dashboard
     temp = 'temperature' # id
     dasb_info = 'octicon octicon-info' # class
