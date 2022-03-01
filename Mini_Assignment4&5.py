@@ -1,40 +1,99 @@
-class Locators:
+import time
+import logging
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from Pages.Locators import Locators
 
-    # Dashboard
-    temp = 'temperature' # id
-    dasb_info = 'octicon octicon-info' # class
-    buy_moist = 'Buy moisturizers' # link text
-    buy_sunsc = 'Buy sunscreens' # link text
+# Logging the errors
+logger = logging.getLogger()
 
-    # Selecting Items
-    items_list = '//div[@class="text-center col-4"]' # xpath
-    Add_btn = '//button[@class="btn btn-primary"]' # xpath
+fileHandler = logging.FileHandler('C:\\Users\\visrilakshmi\\Desktop\\Selenium_logs\\logs.log')
 
+logger.addHandler(fileHandler)
 
-    # Moisturisers selecting item
-    moist_item1 = 'Aloe'
-    moist_item2 = 'Almond'
+# Initiating the driver
+driver = webdriver.Chrome(executable_path='C:\\Users\\visrilakshmi\\Downloads\\chromedriver.exe')
 
-    # Sunscreens selecting item
-    sunscr_item1 = 'SPF-50'
-    sunscr_item2 = 'SPF-30'
+# Opening url
+driver.get('https://weathershopper.pythonanywhere.com/')
 
-    # Payment
-    cart_btn = 'cart' # id
-    pay_btn = 'stripe-button-el' # class name
-    frame = 'stripe_checkout_app'  # frame - pay
-    mail = 'email' # id
-    mail_in = 'sri@gmail.com' # input
-    card = 'card_number' # id
-    card_in = '4242'  # card input
-    card_date = 'cc-exp' # id
-    card_date_in1 = '02'
-    card_date_in2 = '23'
-    card_cvv = 'cc-csc' # id
-    card_cvv_in = '201'
-    pincode = 'billing-zip' # id
-    pin_in = '533125'
-    sub_pay = 'submitButton' # id
+driver.maximize_window()
+time.sleep(2)
+driver.maximize_window()
+
+k = driver.find_element(by=By.ID, value=Locators.temp).text
+k = k.split(' ')
+temp = int(k[0])
+
+logger.error('This is error message')
 
 
+# Adding items to cart based on the info given in the website
+def adding_items(item):
+    rate = []
+    for i in items:
+        time.sleep(2)
+        k = i.text.split('\n')
+        z = k[1].split(' ')
+        for i in z:
+            if i.isdigit():
+                m = i
+        for j in k:
+            if item in j:
+                rate.append(m)
+    rate = min(rate)
+    time.sleep(3)
 
+    for i in items:
+        if rate in i.text:
+            i.find_element(by=By.XPATH, value=Locators.Add_btn).click()
+
+
+# Payment Gateway - entering details of card and checkout
+def payment():
+    driver.find_element(by=By.ID, value=Locators.cart_btn).click()
+    time.sleep(3)
+    driver.find_element(by=By.CLASS_NAME, value=Locators.pay_btn).click()
+    time.sleep(3)
+
+    # Entering Payment Details
+    driver.switch_to.frame(Locators.frame)
+    driver.find_element(by=By.ID, value=Locators.mail).send_keys(Locators.mail_in)
+    time.sleep(3)
+    driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
+    time.sleep(2)
+    driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
+    time.sleep(2)
+    driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
+    time.sleep(2)
+    driver.find_element(by=By.ID, value=Locators.card).send_keys(Locators.card_in)
+    time.sleep(2)
+    driver.find_element(by=By.ID, value=Locators.card_date).send_keys(Locators.card_date_in1)
+    time.sleep(3)
+    driver.find_element(by=By.ID, value=Locators.card_date).send_keys(Locators.card_date_in2)
+    time.sleep(3)
+    driver.find_element(by=By.ID, value=Locators.card_cvv).send_keys(Locators.card_cvv_in)
+    time.sleep(3)
+    driver.find_element(by=By.ID, value=Locators.pincode).send_keys(Locators.pin_in)
+    time.sleep(3)
+    driver.find_element(by=By.ID, value=Locators.sub_pay).click()
+
+
+""" As given in the website executing methods if temperature < 19 then buying moisturisers
+      if temperature > 34 then buying sunscreens based up on cost and flavor"""
+try:
+    if temp <= 19:
+        driver.find_element(by=By.LINK_TEXT, value=Locators.buy_moist).click()
+        items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
+        adding_items(Locators.moist_item1)
+        adding_items(Locators.moist_item2)
+        payment()
+
+    elif temp >= 34:
+        driver.find_element(by=By.LINK_TEXT, value=Locators.buy_sunsc).click()
+        items = driver.find_elements(by=By.XPATH, value=Locators.items_list)
+        adding_items(Locators.sunscr_item1)
+        adding_items(Locators.sunscr_item2)
+        payment()
+except ValueError:
+    logger.error('Error in Item Adding')
